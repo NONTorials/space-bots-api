@@ -1,33 +1,37 @@
 const SpaceApiError = require('./error');
-const botErrors = {
-"Header de autorizacion no encontrado": "API Token no especificado",
-"Bot no encontrado": "ID del bot proporcionada incorrecta",
-"Primero crea un token de autorizacion": "Debes ir a la pagina de tu bot y crear un API Token",
-"Token de autorizacion incorrecto": "El API Token no coincide con el establecido para el bot",
-"Has entrado en cooldown": "API Ratelimit excedido"
-};
+
 
 const fetch = require('node-fetch');
 
-module.exports.getVotes = async(config) =>{
+module.exports.getVotes =  function(config) {
 
 config || (config = {});
 
 fetch(`https://space-bots.tk/api/auth/liked/${config.botID}`, {
+    method: 'GET',
         headers: {
-            Authorization: `${config.apiToken}`
+           "authorization": `${config.apiToken}`,
+             "Content-Type": "application/json"
         }
-    }).then(res =>  res.json().then(json => {
-if(error){
-  if(botErrors[error]){
+    })  .then(response => response.text())
+  .then(console.log)
+  .catch(console.error);
 
-  }else{
 
-  }
 }
 
-
-      return json.users
-    }));
-};
-
+module.exports.setServers = function(config){
+  config || (config = {});
+if(!config.servers) throw new SpaceApiError('Debes declarar la cantidad de servidores de tu bot');
+fetch(`https://space-bots.tk/api/auth/stats/${config.botID}`, {
+    method: 'POST',
+        headers: {
+           "authorization": `${config.apiToken}`,
+             "Content-Type": "application/json"
+        },
+         body: JSON.stringify({"server_count": config.servers})
+    })  .then(response => response.text())
+  .then(console.log)
+  .catch(console.error);
+}
+   
